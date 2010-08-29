@@ -15,6 +15,7 @@
 // limitations under the License.
 
 #import "DREvent.h"
+#import "DRDebuggingMacros.h"
 
 NSString * const DRHDPInputSource        = @"HDP";
 NSString * const DRTVCableInputSource    = @"TV/CBL";
@@ -337,7 +338,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
       }
       break;
   }
-  NSLog(@"unknown event received: %@", rawEvent_);
+  DLog(@"unknown event received: %@", rawEvent_);
   [self setEventType:DenonUnknownEvent];
 }
 

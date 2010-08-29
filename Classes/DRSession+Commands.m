@@ -15,7 +15,7 @@
 // limitations under the License.
 
 #import "DRSession+Commands.h"
-
+#import "DRDebuggingMacros.h"
 
 @implementation DRSession (Commands)
 

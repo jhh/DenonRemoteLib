@@ -15,6 +15,7 @@
 // limitations under the License.
 
 #import "NSStream+Additions.h"
+#import "DRDebuggingMacros.h"
 
 @implementation NSStream (DRAdditions)
 

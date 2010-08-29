@@ -17,6 +17,7 @@
 #import "DRSession.h"
 #import "DREvent.h"
 #import "NSStream+Additions.h"
+#import "DRDebuggingMacros.h"
 
 NSString * const DRRemoteEventReceivedNotification = @"DREventReceived";
 NSString * const DRRemoteEventKey = @"event";
@@ -80,7 +81,7 @@ NSString * const DRRemoteEventKey = @"event";
 }
 
 - (void)sendCommand:(NSString *)command {
-    NSLog(@"%@", command);
+    DLog(@"%@", command);
     [oBuffer_ appendData:[command dataUsingEncoding:NSASCIIStringEncoding]];
     [self processOutgoingBytes];
 }
@@ -99,7 +100,7 @@ NSString * const DRRemoteEventKey = @"event";
             DREvent *event = [[[DREvent alloc] initWithEvent:resp] autorelease];
             
             start = i + 1;
-            NSLog(@"%@", event);
+            DLog(@"%@", event);
             [[self delegate] session:self didReceiveEvent:event];
         }
     }
@@ -135,7 +136,7 @@ NSString * const DRRemoteEventKey = @"event";
         [iBuffer_ appendBytes:(const void *)buf length:len];
     else
         if ([iStream_ streamStatus] != NSStreamStatusAtEnd)
-            NSLog(@"failed to read data from network!");
+            DLog(@"failed to read data from network!");
 }
 
 - (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
@@ -162,7 +163,7 @@ NSString * const DRRemoteEventKey = @"event";
         }
         case NSStreamEventErrorOccurred: {
             NSError *error = [stream streamError];
-            NSLog(@"%@ error: %@", stream, error);
+            DLog(@"%@ error: %@", stream, error);
             [[self delegate] session:self didFailWithError:error];
             [stream close];
             [stream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
