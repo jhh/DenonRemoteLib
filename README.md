@@ -12,8 +12,8 @@ DenonRemoteLib's Objective-C classes can be easily added to your projects. Here'
 
 ## Using DenonRemoteLib
 
-[DREvent][] encapsulates state changes or status updates from the receiver.
+[DREvent](http://github.com/jhh/DenonRemoteLib/blob/master/Classes/DREvent.h "Classes/DREvent.h at master from jhh's DenonRemoteLib - GitHub") encapsulates state changes or status updates from the receiver.
 
-[DRSession][] is a connected session with the receiver. Methods on this class send commands and receive updates.
+[DRSession](http://github.com/jhh/DenonRemoteLib/blob/master/Classes/DRSession.h "Classes/DRSession.h at master from jhh's DenonRemoteLib - GitHub") is a connected session with the receiver. Methods on this class send commands and receive updates.
 
-[DRSession+Commands][] contains convenient methods to request status from and send commands to the receiver.
+[DRSession+Commands](http://github.com/jhh/DenonRemoteLib/blob/master/Classes/DRSession%2BCommands.h "Classes/DRSession+Commands.h at master from jhh's DenonRemoteLib - GitHub") contains convenient methods to request status from and send commands to the receiver.
