@@ -24,26 +24,6 @@ NSString * const DRDVDInputSource        = @"DVD";
 NSString * const DRSatelliteInputSource  = @"SAT";
 
 
-
-NSString * GetInputSourceName(NSString *eventString) {
-  if ([eventString isEqualToString:@"SIHDP"])
-    return @"Apple TV";
-  else if ([eventString isEqualToString:@"SITV/CBL"])
-    return @"Television";
-  else if ([eventString isEqualToString:@"SINET/USB"])
-    return @"Internet Radio";
-  else if ([eventString isEqualToString:@"SIDVD"])
-    return @"DVD";
-  else if ([eventString isEqualToString:@"SIHDRADIO"])
-    return @"HD Radio";
-  else if ([eventString isEqualToString:@"SIHSAT"])
-    return @"Xbox 360";
-  else
-    [NSException raise:NSInvalidArgumentException
-                format:@"Unrecognized input source : %@", eventString];
-  return nil;
-}
-
 // private methods
 @interface DREvent ()
 - (void)parseEventType;
