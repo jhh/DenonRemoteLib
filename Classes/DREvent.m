@@ -357,7 +357,7 @@ NSString * GetInputSourceName(NSString *eventString) {
       }
       break;
   }
-  DLog(@"unknown event received: %@", rawEvent_);
+  NSLog(@"unknown event received: %@", rawEvent_);
   [self setEventType:DenonUnknownEvent];
 }
 
