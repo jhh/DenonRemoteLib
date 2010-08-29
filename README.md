@@ -17,3 +17,7 @@ DenonRemoteLib's Objective-C classes can be easily added to your projects. Here'
 [DRSession](http://github.com/jhh/DenonRemoteLib/blob/master/Classes/DRSession.h "Classes/DRSession.h at master from jhh's DenonRemoteLib - GitHub") is a connected session with the receiver. Methods on this class send commands and receive updates.
 
 [DRSession+Commands](http://github.com/jhh/DenonRemoteLib/blob/master/Classes/DRSession%2BCommands.h "Classes/DRSession+Commands.h at master from jhh's DenonRemoteLib - GitHub") contains convenient methods to request status from and send commands to the receiver.
+
+## License
+
+DenonRemoteLib is published under the Apache License, see the LICENSE file.
