@@ -89,6 +89,18 @@ NSString * const DRSatelliteInputSource  = @"SAT";
           [self rawEvent], [self eventType], [self parameter]] ;
 }
 
+- (void)getInputSource:(NSString **)inputSourcePtr
+               andName:(NSString **)inputSourceNamePtr {
+
+    ZAssert(self.eventType == DenonInputSourceNameEvent,
+            @"do not use this accessor with events other than DenonInputSourceNameEvent");
+
+    NSRange range = [self.parameter rangeOfString:@" "];
+
+    *inputSourcePtr     = [self.parameter substringToIndex:range.location];
+    *inputSourceNamePtr = [[self.parameter substringFromIndex:range.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+}
+
 #pragma mark -
 #pragma mark Parser Methods
 
@@ -145,7 +157,13 @@ NSString * const DRSatelliteInputSource  = @"SAT";
           [self setEventType:DenonLockEvent];
           return;
         case 'S':
-          [self setEventType:DenonSSEvent];
+          if ([[self rawEvent] hasPrefix:@"SSFUN"]) {
+              [self setEventType:DenonInputSourceNameEvent];
+          } else if ([[self rawEvent] hasPrefix:@"SSSPC"]) {
+              [self setEventType:DenonSpeakerStatusEvent];
+          } else {
+              [self setEventType:DenonUnknownEvent];
+          }
           return;
       }
       break; // S
@@ -363,6 +381,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
     case DenonChannelVolumeSurroundLeftEvent:
     case DenonChannelVolumeSurroundRightEvent:
     case DenonChannelVolumeSurroundBackEvent:
+    case DenonInputSourceNameEvent:
       index = 5;
       break;
     case DenonMasterVolumeMaxEvent:

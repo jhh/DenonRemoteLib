@@ -22,6 +22,7 @@ enum {
   DenonMasterVolumeEvent,                    // MV
   DenonMuteEvent,                            // MU
   DenonInputSourceEvent,                     // SI
+  DenonInputSourceNameEvent,                 // SSFUN
   DenonMainZoneEvent,                        // ZM
   DenonRecordSelectEvent,                    // SR
   DenonInputModeEvent,                       // SD
@@ -56,7 +57,7 @@ enum {
   DenoniPodDisplayASCIIEvent,                // IPA
   DenoniPodDisplayUTF8Event,                 // IPE
   DenonLockEvent,                            // SY
-  DenonSSEvent,                              // SS
+  DenonSpeakerStatusEvent,                   // SSSPC
   DenonRMEvent,                              // RM
   DenonMasterVolumeMaxEvent,                 // MVM
   DenonChannelVolumeFrontLeftEvent,          // CVFL
@@ -94,5 +95,7 @@ extern NSString * const DRSatelliteInputSource;
 - (NSString *)stringValue;
 - (BOOL)boolValue;
 - (float)floatValue;
+- (void)getInputSource:(NSString **)inputSourcePtr
+               andName:(NSString **)inputSourceNamePtr;
 
 @end

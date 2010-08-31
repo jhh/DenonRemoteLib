@@ -35,6 +35,18 @@
   [self sendCommand:@"SI?\r"];
 }
 
+- (void) queryInputSourceNames {
+  [self sendCommand:@"SSFUN ?\r"];
+}
+
+- (void) querySpeakerStatus {
+  [self sendCommand:@"SSSPC ?\r"];
+}
+
+- (void) querySpeakerChannelStatus {
+  [self sendCommand:@"PSCHN ?\r"];
+}
+
 - (void)sendPower:(DRState)state {
   if (state == DROnState) {
     [self sendCommand:@"PWON\r"];

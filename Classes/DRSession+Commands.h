@@ -29,6 +29,10 @@ typedef NSUInteger DRState;
 - (void)queryMute;
 - (void)queryMasterVolume;
 - (void)queryInputSource;
+- (void)queryInputSourceNames;
+- (void)querySpeakerStatus;
+- (void)querySpeakerChannelStatus;
+
 - (void)sendPower:(DRState)state;
 - (void)sendMute:(DRState)state;
 - (void)sendMasterVolume:(float)volume;
