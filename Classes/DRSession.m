@@ -1,4 +1,5 @@
 // DRSession.m
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -33,12 +34,12 @@ NSString * const DRRemoteEventKey = @"event";
 
 @synthesize delegate = delegate_;
 
-- (id)initWithHostName:(NSString *)host {
+- (id) initWithHostName:(NSString *)host {
     // default to telnet port
     return [self initWithHostName:host port:23];
 }
 
-- (id)initWithHostName:(NSString *)host port:(NSInteger)port {
+- (id) initWithHostName:(NSString *)host port:(NSInteger)port {
     if (self = [super init]) {
         oBuffer_ = [[NSMutableData alloc] init];
         iBuffer_ = [[NSMutableData alloc] init];
@@ -63,7 +64,7 @@ NSString * const DRRemoteEventKey = @"event";
     return self;
 }
 
-- (void)close {
+- (void) close {
     [iStream_ setDelegate:nil];
     [iStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [iStream_ close];
@@ -72,7 +73,7 @@ NSString * const DRRemoteEventKey = @"event";
     [oStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-- (void)dealloc {
+- (void) dealloc {
     [iStream_ release];
     [oStream_ release];
     [iBuffer_ release];
@@ -80,13 +81,13 @@ NSString * const DRRemoteEventKey = @"event";
     [super dealloc];
 }
 
-- (void)sendCommand:(NSString *)command {
+- (void) sendCommand:(NSString *)command {
     DLog(@"%@", command);
     [oBuffer_ appendData:[command dataUsingEncoding:NSASCIIStringEncoding]];
     [self processOutgoingBytes];
 }
 
-- (void)processResponse {
+- (void) processResponse {
     unsigned start = 0;
     unsigned ilen = [iBuffer_ length];
     
@@ -108,7 +109,7 @@ NSString * const DRRemoteEventKey = @"event";
     [iBuffer_ setLength:ilen - start];
 }
 
-- (void)processOutgoingBytes {
+- (void) processOutgoingBytes {
     // write as many bytes as possible from buffered bytes.
     if (![oStream_ hasSpaceAvailable]) return;
     
@@ -125,7 +126,7 @@ NSString * const DRRemoteEventKey = @"event";
     }
 }
 
-- (void)readIncomingBytes {
+- (void) readIncomingBytes {
     if (![iStream_ hasBytesAvailable]) return;
     
     uint8_t buf[512];
@@ -139,7 +140,7 @@ NSString * const DRRemoteEventKey = @"event";
             DLog(@"failed to read data from network!");
 }
 
-- (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
+- (void) stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
     switch (eventCode) {
         case NSStreamEventOpenCompleted: {
             if (stream == iStream_) {

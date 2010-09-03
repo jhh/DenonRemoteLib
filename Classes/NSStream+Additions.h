@@ -1,4 +1,5 @@
 // NSStream+Additions.h
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -19,8 +20,8 @@
 // From Technical Q&A QA1652
 @interface NSStream (DRAdditions)
 
-+ (void)getStreamsToHostNamed:(NSString *)hostName 
-                         port:(NSInteger)port 
-                  inputStream:(NSInputStream **)inputStreamPtr 
-                 outputStream:(NSOutputStream **)outputStreamPtr;
++ (void) getStreamsToHostNamed:(NSString *)hostName 
+                          port:(NSInteger)port 
+                   inputStream:(NSInputStream **)inputStreamPtr 
+                  outputStream:(NSOutputStream **)outputStreamPtr;
 @end

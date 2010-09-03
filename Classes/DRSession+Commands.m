@@ -1,4 +1,5 @@
 // DRSession+Commands.m
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -19,58 +20,58 @@
 
 @implementation DRSession (Commands)
 
-- (void)queryStandby {
-  [self sendCommand:@"PW?\r"];
+- (void) queryStandby {
+    [self sendCommand:@"PW?\r"];
 }
 
-- (void)queryMute {
-  [self sendCommand:@"MU?\r"];
+- (void) queryMute {
+    [self sendCommand:@"MU?\r"];
 }
 
-- (void)queryMasterVolume {
-  [self sendCommand:@"MV?\r"];
+- (void) queryMasterVolume {
+    [self sendCommand:@"MV?\r"];
 }
 
-- (void)queryInputSource {
-  [self sendCommand:@"SI?\r"];
+- (void) queryInputSource {
+    [self sendCommand:@"SI?\r"];
 }
 
 - (void) queryInputSourceNames {
-  [self sendCommand:@"SSFUN ?\r"];
+    [self sendCommand:@"SSFUN ?\r"];
 }
 
 - (void) querySpeakerStatus {
-  [self sendCommand:@"SSSPC ?\r"];
+    [self sendCommand:@"SSSPC ?\r"];
 }
 
 - (void) querySpeakerChannelStatus {
-  [self sendCommand:@"PSCHN ?\r"];
+    [self sendCommand:@"PSCHN ?\r"];
 }
 
-- (void)sendPower:(DRState)state {
-  if (state == DROnState) {
-    [self sendCommand:@"PWON\r"];
-  } else {
-    [self sendCommand:@"PWSTANDBY\r"];
-  }
+- (void) sendPower:(DRState)state {
+    if (state == DROnState) {
+        [self sendCommand:@"PWON\r"];
+    } else {
+        [self sendCommand:@"PWSTANDBY\r"];
+    }
 }
 
-- (void)sendMute:(DRState)state {
-  if (state == DROnState) {
-    [self sendCommand:@"MUON\r"];
-  } else {
-    [self sendCommand:@"MUOFF\r"];
-  }
+- (void) sendMute:(DRState)state {
+    if (state == DROnState) {
+        [self sendCommand:@"MUON\r"];
+    } else {
+        [self sendCommand:@"MUOFF\r"];
+    }
 }
 
-- (void)sendMasterVolume:(float)volume {
-  volume += 80.0;
-  NSParameterAssert((volume > 0) && (volume < 80));
-  [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
+- (void) sendMasterVolume:(float)volume {
+    volume += 80.0;
+    NSParameterAssert((volume > 0) && (volume < 80));
+    [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
 }
 
-- (void)sendInputSource:(NSString *)source {
-  [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source]];
+- (void) sendInputSource:(NSString *)source {
+    [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source]];
 }
 
 @end

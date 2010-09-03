@@ -1,4 +1,5 @@
 // DRSession+Commands.h
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -18,24 +19,24 @@
 #import "DRSession.h"
 
 enum {
-  DROffState = 0,
-  DROnState  = 1
+    DROffState = 0,
+    DROnState  = 1
 };
 typedef NSUInteger DRState;
 
 @interface DRSession (Commands)
 
-- (void)queryStandby;
-- (void)queryMute;
-- (void)queryMasterVolume;
-- (void)queryInputSource;
-- (void)queryInputSourceNames;
-- (void)querySpeakerStatus;
-- (void)querySpeakerChannelStatus;
+- (void) queryStandby;
+- (void) queryMute;
+- (void) queryMasterVolume;
+- (void) queryInputSource;
+- (void) queryInputSourceNames;
+- (void) querySpeakerStatus;
+- (void) querySpeakerChannelStatus;
 
-- (void)sendPower:(DRState)state;
-- (void)sendMute:(DRState)state;
-- (void)sendMasterVolume:(float)volume;
-- (void)sendInputSource:(NSString *)source;
+- (void) sendPower:(DRState)state;
+- (void) sendMute:(DRState)state;
+- (void) sendMasterVolume:(float)volume;
+- (void) sendInputSource:(NSString *)source;
 
 @end

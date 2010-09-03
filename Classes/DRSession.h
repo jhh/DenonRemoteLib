@@ -1,4 +1,5 @@
 // DRSession.h
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -32,27 +33,27 @@ extern NSString * const DRRemoteEventKey;
 #if TARGET_OS_IPHONE
 
 @interface DRSession : NSObject {
-
+    
 #else
-
+    
 @interface DRSession : NSObject <NSStreamDelegate> {
-
+        
 #endif
-  
+        
 @private
-  NSInputStream *iStream_;
-  NSOutputStream *oStream_;
-  NSMutableData *iBuffer_;
-  NSMutableData *oBuffer_;
-  id<DRSessionDelegate> delegate_;    
-  
+    NSInputStream *iStream_;
+    NSOutputStream *oStream_;
+    NSMutableData *iBuffer_;
+    NSMutableData *oBuffer_;
+    id<DRSessionDelegate> delegate_;    
+    
 }
 
 @property (assign) id<DRSessionDelegate> delegate;
 
-- (id)initWithHostName:(NSString *)host;
-- (id)initWithHostName:(NSString *)host port:(NSInteger)port;
-- (void)sendCommand:(NSString *)command;
-- (void)close;
+- (id) initWithHostName:(NSString *)host;
+- (id) initWithHostName:(NSString *)host port:(NSInteger)port;
+- (void) sendCommand:(NSString *)command;
+- (void) close;
 
 @end
