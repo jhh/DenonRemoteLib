@@ -16,6 +16,7 @@
 // limitations under the License.
 
 #import "DREvent.h"
+#import "DRInputSource.h"
 #import "DRDebuggingMacros.h"
 
 NSString * const DRHDPInputSource        = @"HDP";
@@ -90,16 +91,10 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             [self rawEvent], [self eventType], [self parameter]] ;
 }
 
-- (void) getInputSource:(NSString **)inputSourcePtr
-                andName:(NSString **)inputSourceNamePtr {
-    
-    ZAssert(self.eventType == DenonInputSourceNameEvent,
-            @"do not use this accessor with events other than DenonInputSourceNameEvent");
-    
-    NSRange range = [self.parameter rangeOfString:@" "];
-    
-    *inputSourcePtr     = [self.parameter substringToIndex:range.location];
-    *inputSourceNamePtr = [[self.parameter substringFromIndex:range.location+1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+- (DRInputSource *) inputSource {
+    ZAssert(self.eventType == DenonInputSourceNameEvent || self.eventType == DenonInputSourceUsageEvent,
+            @"do not use this accessor with this type of event: %@", self);
+    return [[[DRInputSource alloc] initWithEvent:self] autorelease];
 }
 
 #pragma mark -
@@ -162,6 +157,8 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                         [self setEventType:DenonInputSourceNameEvent];
                     } else if ([[self rawEvent] hasPrefix:@"SSSPC"]) {
                         [self setEventType:DenonSpeakerStatusEvent];
+                    } else if ([[self rawEvent] hasPrefix:@"SSSOD"]) {
+                        [self setEventType:DenonInputSourceUsageEvent];
                     } else {
                         [self setEventType:DenonUnknownEvent];
                     }
@@ -383,6 +380,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
         case DenonChannelVolumeSurroundRightEvent:
         case DenonChannelVolumeSurroundBackEvent:
         case DenonInputSourceNameEvent:
+        case DenonInputSourceUsageEvent:
             index = 5;
             break;
         case DenonMasterVolumeMaxEvent:
