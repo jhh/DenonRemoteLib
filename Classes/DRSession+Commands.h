@@ -31,6 +31,7 @@ typedef NSUInteger DRState;
 - (void) queryMasterVolume;
 - (void) queryInputSource;
 - (void) queryInputSourceNames;
+- (void) queryInputSourceUsage;
 - (void) querySpeakerStatus;
 - (void) querySpeakerChannelStatus;
 
