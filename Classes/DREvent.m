@@ -40,7 +40,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 
 #pragma mark -
 #pragma mark Memory Methods
-- (id) initWithEvent:(NSString *)raw {
+- (id) initWithRawEvent:(NSString *)raw {
     if((self = [super init])) {
         rawEvent_ = [raw retain];
         [self parseEventType];

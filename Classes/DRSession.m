@@ -98,7 +98,7 @@ NSString * const DRRemoteEventKey = @"event";
                                                        length:i - start
                                                      encoding:NSASCIIStringEncoding] autorelease];
             
-            DREvent *event = [[[DREvent alloc] initWithEvent:resp] autorelease];
+            DREvent *event = [[[DREvent alloc] initWithRawEvent:resp] autorelease];
             
             start = i + 1;
             DLog(@"%@", event);

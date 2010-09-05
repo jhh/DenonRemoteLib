@@ -91,7 +91,7 @@ extern NSString * const DRSatelliteInputSource;
 @property (retain) NSString *parameter;
 @property (assign) DenonEventType eventType;
 
-- (id) initWithEvent:(NSString *)rawEvent;
+- (id) initWithRawEvent:(NSString *)rawEvent;
 
 - (NSString *) stringValue;
 - (BOOL) boolValue;
