@@ -1,4 +1,4 @@
-// DRSession+Commands.h
+// DRInputSource.h
 // DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
@@ -16,28 +16,18 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import "DRSession.h"
+@class DREvent;
 
-enum {
-    DROffState = 0,
-    DROnState  = 1
-};
-typedef NSUInteger DRState;
 
-@interface DRSession (Commands)
+@interface DRInputSource : NSObject {
+@private
+    NSString * _source;
+    NSString * _name;
+}
 
-- (void) queryStandby;
-- (void) queryMute;
-- (void) queryMasterVolume;
-- (void) queryInputSource;
-- (void) queryInputSourceNames;
-- (void) queryInputSourceUsage;
-- (void) querySpeakerStatus;
-- (void) querySpeakerChannelStatus;
+- (id) initWithEvent:(DREvent *)event;
+- (id) initWithSource:(NSString *)aSource andName:(NSString *)aName;
 
-- (void) sendPower:(DRState)state;
-- (void) sendMute:(DRState)state;
-- (void) sendMasterVolume:(float)volume;
-- (void) sendInputSource:(NSString *)source;
-
+@property (nonatomic, copy, readonly) NSString * source;
+@property (nonatomic, copy, readonly) NSString * name;
 @end

@@ -16,6 +16,7 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
+@class DRInputSource;
 
 enum {
     DenonUnknownEvent,
@@ -24,6 +25,7 @@ enum {
     DenonMuteEvent,                            // MU
     DenonInputSourceEvent,                     // SI
     DenonInputSourceNameEvent,                 // SSFUN
+    DenonInputSourceUsageEvent,                // SSSOD
     DenonMainZoneEvent,                        // ZM
     DenonRecordSelectEvent,                    // SR
     DenonInputModeEvent,                       // SD
@@ -91,12 +93,11 @@ extern NSString * const DRSatelliteInputSource;
 @property (retain) NSString *parameter;
 @property (assign) DenonEventType eventType;
 
-- (id) initWithEvent:(NSString *)rawEvent;
+- (id) initWithRawEvent:(NSString *)rawEvent;
 
 - (NSString *) stringValue;
 - (BOOL) boolValue;
 - (float) floatValue;
-- (void) getInputSource:(NSString **)inputSourcePtr
-                andName:(NSString **)inputSourceNamePtr;
+- (DRInputSource *) inputSource;
 
 @end

@@ -40,6 +40,10 @@
     [self sendCommand:@"SSFUN ?\r"];
 }
 
+- (void) queryInputSourceUsage {
+    [self sendCommand:@"SSSOD ?\r"];
+}
+
 - (void) querySpeakerStatus {
     [self sendCommand:@"SSSPC ?\r"];
 }
