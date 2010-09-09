@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DRSession.h"
+@class DRInputSource;
 
 enum {
     DROffState = 0,
@@ -38,6 +39,6 @@ typedef NSUInteger DRState;
 - (void) sendPower:(DRState)state;
 - (void) sendMute:(DRState)state;
 - (void) sendMasterVolume:(float)volume;
-- (void) sendInputSource:(NSString *)source;
+- (void) sendInputSource:(DRInputSource *)source;
 
 @end

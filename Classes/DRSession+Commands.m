@@ -16,6 +16,7 @@
 // limitations under the License.
 
 #import "DRSession+Commands.h"
+#import "DRInputSource.h"
 #import "DRDebuggingMacros.h"
 
 @implementation DRSession (Commands)
@@ -74,8 +75,8 @@
     [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
 }
 
-- (void) sendInputSource:(NSString *)source {
-    [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source]];
+- (void) sendInputSource:(DRInputSource *)source {
+    [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source.source]];
 }
 
 @end
