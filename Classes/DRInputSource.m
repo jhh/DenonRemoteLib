@@ -35,9 +35,16 @@
 
 - (id) initWithEvent:(DREvent *)event {
     NSRange range = [event.parameter rangeOfString:@" "];
-    NSString * src = [event.parameter substringToIndex:range.location];
-    NSString * nm = [[event.parameter substringFromIndex:range.location+1]
-                     stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+    NSString * src, * nm;
+    if (range.location != NSNotFound) {
+        src = [event.parameter substringToIndex:range.location];
+        nm = [[event.parameter substringFromIndex:range.location+1]
+                stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    } else {
+        src = event.parameter;
+        nm = event.parameter;
+    }
 
     return [self initWithSource:src andName:nm];
 }

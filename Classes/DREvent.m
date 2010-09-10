@@ -92,7 +92,9 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 }
 
 - (DRInputSource *) inputSource {
-    ZAssert(self.eventType == DenonInputSourceNameEvent || self.eventType == DenonInputSourceUsageEvent,
+    ZAssert(self.eventType == DenonInputSourceNameEvent
+            || self.eventType == DenonInputSourceUsageEvent
+            || self.eventType == DenonInputSourceEvent,
             @"do not use this accessor with this type of event: %@", self);
     return [[[DRInputSource alloc] initWithEvent:self] autorelease];
 }
