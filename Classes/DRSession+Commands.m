@@ -71,7 +71,7 @@
 
 - (void) sendMasterVolume:(float)volume {
     volume += 80.0;
-    NSParameterAssert((volume > 0) && (volume < 80));
+    NSParameterAssert((volume >= 0.0) && (volume <= 98.0));
     [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
 }
 
