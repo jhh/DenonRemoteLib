@@ -1,4 +1,4 @@
-// NSStream+Additions.h
+// DRInputSource.h
 // DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
@@ -16,12 +16,18 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
+@class DREvent;
 
-// From Technical Q&A QA1652
-@interface NSStream (DRAdditions)
 
-+ (void) getStreamsToHostNamed:(NSString *)hostName 
-                          port:(NSInteger)port 
-                   inputStream:(NSInputStream **)inputStreamPtr 
-                  outputStream:(NSOutputStream **)outputStreamPtr;
+@interface DRInputSource : NSObject {
+@private
+    NSString * _source;
+    NSString * _name;
+}
+
+- (id) initWithEvent:(DREvent *)event;
+- (id) initWithSource:(NSString *)aSource andName:(NSString *)aName;
+
+@property (nonatomic, copy, readonly) NSString * source;
+@property (nonatomic, copy, readonly) NSString * name;
 @end

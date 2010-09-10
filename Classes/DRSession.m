@@ -1,4 +1,5 @@
 // DRSession.m
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -17,27 +18,28 @@
 #import "DRSession.h"
 #import "DREvent.h"
 #import "NSStream+Additions.h"
+#import "DRDebuggingMacros.h"
 
 NSString * const DRRemoteEventReceivedNotification = @"DREventReceived";
 NSString * const DRRemoteEventKey = @"event";
 
 @interface DRSession ()
-- (void)processOutgoingBytes;
-- (void)readIncomingBytes;
-- (void)processResponse;
-- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode;
+- (void) processOutgoingBytes;
+- (void) readIncomingBytes;
+- (void) processResponse;
+- (void) stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode;
 @end
 
 @implementation DRSession
 
 @synthesize delegate = delegate_;
 
-- (id)initWithHostName:(NSString *)host {
+- (id) initWithHostName:(NSString *)host {
     // default to telnet port
     return [self initWithHostName:host port:23];
 }
 
-- (id)initWithHostName:(NSString *)host port:(NSInteger)port {
+- (id) initWithHostName:(NSString *)host port:(NSInteger)port {
     if (self = [super init]) {
         oBuffer_ = [[NSMutableData alloc] init];
         iBuffer_ = [[NSMutableData alloc] init];
@@ -62,7 +64,7 @@ NSString * const DRRemoteEventKey = @"event";
     return self;
 }
 
-- (void)close {
+- (void) close {
     [iStream_ setDelegate:nil];
     [iStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [iStream_ close];
@@ -71,7 +73,7 @@ NSString * const DRRemoteEventKey = @"event";
     [oStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
-- (void)dealloc {
+- (void) dealloc {
     [iStream_ release];
     [oStream_ release];
     [iBuffer_ release];
@@ -79,13 +81,13 @@ NSString * const DRRemoteEventKey = @"event";
     [super dealloc];
 }
 
-- (void)sendCommand:(NSString *)command {
-    NSLog(@"%@", command);
+- (void) sendCommand:(NSString *)command {
+    DLog(@"%@", command);
     [oBuffer_ appendData:[command dataUsingEncoding:NSASCIIStringEncoding]];
     [self processOutgoingBytes];
 }
 
-- (void)processResponse {
+- (void) processResponse {
     unsigned start = 0;
     unsigned ilen = [iBuffer_ length];
     
@@ -96,10 +98,10 @@ NSString * const DRRemoteEventKey = @"event";
                                                        length:i - start
                                                      encoding:NSASCIIStringEncoding] autorelease];
             
-            DREvent *event = [[[DREvent alloc] initWithEvent:resp] autorelease];
+            DREvent *event = [[[DREvent alloc] initWithRawEvent:resp] autorelease];
             
             start = i + 1;
-            NSLog(@"%@", event);
+            DLog(@"%@", event);
             [[self delegate] session:self didReceiveEvent:event];
         }
     }
@@ -107,7 +109,7 @@ NSString * const DRRemoteEventKey = @"event";
     [iBuffer_ setLength:ilen - start];
 }
 
-- (void)processOutgoingBytes {
+- (void) processOutgoingBytes {
     // write as many bytes as possible from buffered bytes.
     if (![oStream_ hasSpaceAvailable]) return;
     
@@ -124,7 +126,7 @@ NSString * const DRRemoteEventKey = @"event";
     }
 }
 
-- (void)readIncomingBytes {
+- (void) readIncomingBytes {
     if (![iStream_ hasBytesAvailable]) return;
     
     uint8_t buf[512];
@@ -135,10 +137,10 @@ NSString * const DRRemoteEventKey = @"event";
         [iBuffer_ appendBytes:(const void *)buf length:len];
     else
         if ([iStream_ streamStatus] != NSStreamStatusAtEnd)
-            NSLog(@"failed to read data from network!");
+            DLog(@"failed to read data from network!");
 }
 
-- (void)stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
+- (void) stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
     switch (eventCode) {
         case NSStreamEventOpenCompleted: {
             if (stream == iStream_) {
@@ -162,7 +164,7 @@ NSString * const DRRemoteEventKey = @"event";
         }
         case NSStreamEventErrorOccurred: {
             NSError *error = [stream streamError];
-            NSLog(@"%@ error: %@", stream, error);
+            DLog(@"%@ error: %@", stream, error);
             [[self delegate] session:self didFailWithError:error];
             [stream close];
             [stream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];

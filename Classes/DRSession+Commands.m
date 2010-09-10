@@ -1,4 +1,5 @@
 // DRSession+Commands.m
+// DenonRemoteLib
 //
 // Copyright 2010 Jeffrey Hutchison
 //
@@ -15,50 +16,67 @@
 // limitations under the License.
 
 #import "DRSession+Commands.h"
-
+#import "DRInputSource.h"
+#import "DRDebuggingMacros.h"
 
 @implementation DRSession (Commands)
 
-- (void)queryStandby {
-  [self sendCommand:@"PW?\r"];
+- (void) queryStandby {
+    [self sendCommand:@"PW?\r"];
 }
 
-- (void)queryMute {
-  [self sendCommand:@"MU?\r"];
+- (void) queryMute {
+    [self sendCommand:@"MU?\r"];
 }
 
-- (void)queryMasterVolume {
-  [self sendCommand:@"MV?\r"];
+- (void) queryMasterVolume {
+    [self sendCommand:@"MV?\r"];
 }
 
-- (void)queryInputSource {
-  [self sendCommand:@"SI?\r"];
+- (void) queryInputSource {
+    [self sendCommand:@"SI?\r"];
 }
 
-- (void)sendPower:(DRState)state {
-  if (state == DROnState) {
-    [self sendCommand:@"PWON\r"];
-  } else {
-    [self sendCommand:@"PWSTANDBY\r"];
-  }
+- (void) queryInputSourceNames {
+    [self sendCommand:@"SSFUN ?\r"];
 }
 
-- (void)sendMute:(DRState)state {
-  if (state == DROnState) {
-    [self sendCommand:@"MUON\r"];
-  } else {
-    [self sendCommand:@"MUOFF\r"];
-  }
+- (void) queryInputSourceUsage {
+    [self sendCommand:@"SSSOD ?\r"];
 }
 
-- (void)sendMasterVolume:(float)volume {
-  volume += 80.0;
-  NSParameterAssert((volume > 0) && (volume < 80));
-  [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
+- (void) querySpeakerStatus {
+    [self sendCommand:@"SSSPC ?\r"];
 }
 
-- (void)sendInputSource:(NSString *)source {
-  [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source]];
+- (void) querySpeakerChannelStatus {
+    [self sendCommand:@"PSCHN ?\r"];
+}
+
+- (void) sendPower:(DRState)state {
+    if (state == DROnState) {
+        [self sendCommand:@"PWON\r"];
+    } else {
+        [self sendCommand:@"PWSTANDBY\r"];
+    }
+}
+
+- (void) sendMute:(DRState)state {
+    if (state == DROnState) {
+        [self sendCommand:@"MUON\r"];
+    } else {
+        [self sendCommand:@"MUOFF\r"];
+    }
+}
+
+- (void) sendMasterVolume:(float)volume {
+    volume += 80.0;
+    NSParameterAssert((volume >= 0.0) && (volume <= 98.0));
+    [self sendCommand:[NSString stringWithFormat:@"MV%02i\r", lroundf(volume)]];
+}
+
+- (void) sendInputSource:(DRInputSource *)source {
+    [self sendCommand:[NSString stringWithFormat:@"SI%@\r", source.source]];
 }
 
 @end
