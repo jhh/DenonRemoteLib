@@ -29,8 +29,8 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 
 // private methods
 @interface DREvent ()
-- (void)parseEventType;
-- (void)parseParameter;
+- (void) parseEventType;
+- (void) parseParameter;
 @end
 
 @implementation DREvent

@@ -24,10 +24,10 @@ NSString * const DRRemoteEventReceivedNotification = @"DREventReceived";
 NSString * const DRRemoteEventKey = @"event";
 
 @interface DRSession ()
-- (void)processOutgoingBytes;
-- (void)readIncomingBytes;
-- (void)processResponse;
-- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode;
+- (void) processOutgoingBytes;
+- (void) readIncomingBytes;
+- (void) processResponse;
+- (void) stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode;
 @end
 
 @implementation DRSession

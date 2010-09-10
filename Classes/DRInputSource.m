@@ -25,7 +25,7 @@
 @synthesize source = _source;
 @synthesize name   = _name;
 
-- (id)initWithSource:(NSString *)aSource andName:(NSString *)aName {
+- (id) initWithSource:(NSString *)aSource andName:(NSString *)aName {
     if ((self = [super init])) {
         _source = [aSource copy];
         _name   = [aName copy];
@@ -46,7 +46,7 @@
     return [NSString stringWithFormat:@"%@ %@ => %@", [super description], self.source, self.name] ;
 }
 
-- (void)dealloc {
+- (void) dealloc {
     [_source dealloc];
     [_name dealloc];
     [super dealloc];
