@@ -17,10 +17,8 @@
 
 #import <Foundation/Foundation.h>
 @class DRSession;
+@class AsyncSocket;
 @class DREvent;
-
-extern NSString * const DRRemoteEventReceivedNotification;
-extern NSString * const DRRemoteEventKey;
 
 @protocol DRSessionDelegate
 
@@ -30,22 +28,11 @@ extern NSString * const DRRemoteEventKey;
 @end
 
 
-#if TARGET_OS_IPHONE
-
 @interface DRSession : NSObject {
     
-#else
-    
-@interface DRSession : NSObject <NSStreamDelegate> {
-        
-#endif
-        
 @private
-    NSInputStream *iStream_;
-    NSOutputStream *oStream_;
-    NSMutableData *iBuffer_;
-    NSMutableData *oBuffer_;
-    id<DRSessionDelegate> delegate_;    
+    AsyncSocket * socket;
+    id<DRSessionDelegate> _delegate;
     
 }
 
@@ -57,3 +44,4 @@ extern NSString * const DRRemoteEventKey;
 - (void) close;
 
 @end
+

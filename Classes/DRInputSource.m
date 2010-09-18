@@ -35,9 +35,16 @@
 
 - (id) initWithEvent:(DREvent *)event {
     NSRange range = [event.parameter rangeOfString:@" "];
-    NSString * src = [event.parameter substringToIndex:range.location];
-    NSString * nm = [[event.parameter substringFromIndex:range.location+1]
-                     stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+    NSString * src, * nm;
+    if (range.location != NSNotFound) {
+        src = [event.parameter substringToIndex:range.location];
+        nm = [[event.parameter substringFromIndex:range.location+1]
+                stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    } else {
+        src = event.parameter;
+        nm = event.parameter;
+    }
 
     return [self initWithSource:src andName:nm];
 }
@@ -63,9 +70,9 @@
 }
 
 - (NSUInteger) hash {
-    int prime = 31;
-    int result = 1;
-    result = prime * result + [self.source hash];
+    NSUInteger prime = 31;
+    NSUInteger result = 1;
+    result = prime + [self.source hash];
     result = prime * result + [self.name hash];
     return result;
 }

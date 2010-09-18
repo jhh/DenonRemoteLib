@@ -35,15 +35,15 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 
 @implementation DREvent
 
-@synthesize rawEvent = rawEvent_;
-@synthesize parameter = parameter_;
-@synthesize eventType = eventType_;
+@synthesize rawEvent = _rawEvent;
+@synthesize parameter = _parameter;
+@synthesize eventType = _eventType;
 
 #pragma mark -
-#pragma mark Memory Methods
+#pragma mark init & dealloc methods
 - (id) initWithRawEvent:(NSString *)raw {
     if((self = [super init])) {
-        rawEvent_ = [raw retain];
+        _rawEvent = [raw retain];
         [self parseEventType];
         [self parseParameter];
     }
@@ -51,8 +51,8 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 }
 
 - (void) dealloc {
-    [[self rawEvent] release];
-    [parameter_ release];
+    [_rawEvent release];
+    [_parameter release];
     [super dealloc];
 }
 
@@ -61,20 +61,20 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 
 - (float) floatValue {
     float value = 0.0;
-    NSString *p = [self parameter];
-    switch ([parameter_ length]) {
+    switch ([self.parameter length]) {
         case 2:
-            value = [p floatValue] - 80.0;
+            value = [self.parameter floatValue] - 80.0;
             break;
         case 3:
-            value = ([p floatValue] / 10.0) - 80.0;
+            value = ([self.parameter floatValue] / 10.0) - 80.0;
             break;
         case 6:
-            value = [p floatValue] / 100.0;
+            value = [self.parameter floatValue] / 100.0;
             break;
         default:
             break;
     }
+    DLog(@"converting floatValue, parameter= %@, float = %g", self.parameter, value);
     return value;
 }
 
@@ -88,11 +88,13 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 
 - (NSString *) description {
     return [NSString stringWithFormat:@"%@ (%u): %@",
-            [self rawEvent], [self eventType], [self parameter]] ;
+            self.rawEvent, [self eventType], [self parameter]] ;
 }
 
 - (DRInputSource *) inputSource {
-    ZAssert(self.eventType == DenonInputSourceNameEvent || self.eventType == DenonInputSourceUsageEvent,
+    ZAssert(self.eventType == DenonInputSourceNameEvent
+            || self.eventType == DenonInputSourceUsageEvent
+            || self.eventType == DenonInputSourceEvent,
             @"do not use this accessor with this type of event: %@", self);
     return [[[DRInputSource alloc] initWithEvent:self] autorelease];
 }
@@ -101,12 +103,12 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 #pragma mark Parser Methods
 
 - (void) parseEventType {
-    switch ([[self rawEvent] characterAtIndex:0]) {
+    switch ([self.rawEvent characterAtIndex:0]) {
         case 'M':
             // MV, MU, MS
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'V':
-                    if ([[self rawEvent] characterAtIndex:2] == 'M') {
+                    if ([self.rawEvent characterAtIndex:2] == 'M') {
                         [self setEventType:DenonMasterVolumeMaxEvent];
                     } else {
                         [self setEventType:DenonMasterVolumeEvent];
@@ -122,7 +124,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // M
         case 'P':
             // PW, PS, PV
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'W':
                     [self setEventType:DenonPowerEvent];
                     return;
@@ -136,7 +138,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // P
         case 'S':
             // SI, SR, SD, SV, SY, SS
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'I':
                     [self setEventType:DenonInputSourceEvent];
                     return;
@@ -153,11 +155,11 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                     [self setEventType:DenonLockEvent];
                     return;
                 case 'S':
-                    if ([[self rawEvent] hasPrefix:@"SSFUN"]) {
+                    if ([self.rawEvent hasPrefix:@"SSFUN"]) {
                         [self setEventType:DenonInputSourceNameEvent];
-                    } else if ([[self rawEvent] hasPrefix:@"SSSPC"]) {
+                    } else if ([self.rawEvent hasPrefix:@"SSSPC"]) {
                         [self setEventType:DenonSpeakerStatusEvent];
-                    } else if ([[self rawEvent] hasPrefix:@"SSSOD"]) {
+                    } else if ([self.rawEvent hasPrefix:@"SSSOD"]) {
                         [self setEventType:DenonInputSourceUsageEvent];
                     } else {
                         [self setEventType:DenonUnknownEvent];
@@ -167,7 +169,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // S
         case 'Z':
             // ZM, Z2, Z3, Z4
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'M':
                     [self setEventType:DenonMainZoneEvent];
                     return;
@@ -182,15 +184,15 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                     return;
                 default:
                     [NSException raise:NSInternalInconsistencyException
-                                format:@"Unrecognized event - %@", rawEvent_];
+                                format:@"Unrecognized event - %@", self.rawEvent];
                     break;
             }
             break; // Z
         case 'T':
             // TF, TP, TM
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'F':
-                    switch ([[self rawEvent] characterAtIndex:2]) {
+                    switch ([self.rawEvent characterAtIndex:2]) {
                         case 'A':
                             [self setEventType:DenonAnalogRadioFrequencyEvent];
                             return;
@@ -198,7 +200,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                             [self setEventType:DenonXMRadioFrequencyEvent];
                             return;
                         case 'H':
-                            if ([[self rawEvent] characterAtIndex:4] == 'M') {
+                            if ([self.rawEvent characterAtIndex:4] == 'M') {
                                 [self setEventType:DenonHDRadioMulticastChannelEvent];
                             } else {
                                 [self setEventType:DenonHDRadioFrequencyEvent];
@@ -211,7 +213,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                             break;
                     }
                 case 'P':
-                    switch ([[self rawEvent] characterAtIndex:2]) {
+                    switch ([self.rawEvent characterAtIndex:2]) {
                         case 'A':
                             [self setEventType:DenonAnalogRadioPresetEvent];
                             return;
@@ -228,7 +230,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                             break;
                     }
                 case 'M':
-                    switch ([[self rawEvent] characterAtIndex:2]) {
+                    switch ([self.rawEvent characterAtIndex:2]) {
                         case 'A':
                             [self setEventType:DenonAnalogRadioBandOrModeEvent];
                             return;
@@ -245,7 +247,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // T
         case 'D':
             // DC, DA
-            switch ([[self rawEvent] characterAtIndex:1]) {
+            switch ([self.rawEvent characterAtIndex:1]) {
                 case 'C':
                     [self setEventType:DenonDigitalInputModeEvent];
                     return;
@@ -256,7 +258,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // D
         case 'N':
             // NSA, NSE, NSR, NSH
-            switch ([[self rawEvent] characterAtIndex:2]) {
+            switch ([self.rawEvent characterAtIndex:2]) {
                 case 'A':
                     [self setEventType:DenonNetUSBDisplayASCIIEvent];
                     return;
@@ -273,7 +275,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // N
         case 'I':
             // IPA, IPE
-            switch ([[self rawEvent] characterAtIndex:2]) {
+            switch ([self.rawEvent characterAtIndex:2]) {
                 case 'A':
                     [self setEventType:DenoniPodDisplayASCIIEvent];
                     return;
@@ -286,11 +288,11 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             break; // I
         case 'C':
             // CVFL/R, CVC, CVSW, CVSL/R, CVSBL/R, CVSB
-            switch ([[self rawEvent] characterAtIndex:2]) {
+            switch ([self.rawEvent characterAtIndex:2]) {
                 case 'F':
-                    if ([[self rawEvent] characterAtIndex:3] == 'L') {
+                    if ([self.rawEvent characterAtIndex:3] == 'L') {
                         [self setEventType:DenonChannelVolumeFrontLeftEvent];                        
-                    } else if ([[self rawEvent] characterAtIndex:3] == 'R') {
+                    } else if ([self.rawEvent characterAtIndex:3] == 'R') {
                         [self setEventType:DenonChannelVolumeFrontRightEvent];
                     }
                     return;
@@ -298,7 +300,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                     [self setEventType:DenonChannelVolumeCenterEvent];
                     return;
                 case 'S':
-                    switch ([[self rawEvent] characterAtIndex:3]) {
+                    switch ([self.rawEvent characterAtIndex:3]) {
                         case 'L':
                             [self setEventType:DenonChannelVolumeSurroundLeftEvent];
                             return;
@@ -309,7 +311,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
                             [self setEventType:DenonChannelVolumeSubwooferEvent];
                             return;
                         case 'B':
-                            switch ([[self rawEvent] characterAtIndex:4]) {
+                            switch ([self.rawEvent characterAtIndex:4]) {
                                 case ' ':
                                     [self setEventType:DenonChannelVolumeSurroundBackEvent];
                                     return;
@@ -330,37 +332,37 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             }
             break;
         case 'H':
-            if ([[self rawEvent] characterAtIndex:1] == 'D') {
+            if ([self.rawEvent characterAtIndex:1] == 'D') {
                 [self setEventType:DenonRadioHDStatusEvent];
                 return;
             }
             break;
         case 'X':
-            if ([[self rawEvent] characterAtIndex:1] == 'M') {
+            if ([self.rawEvent characterAtIndex:1] == 'M') {
                 [self setEventType:DenonRadioXMStatusEvent];
                 return;
             }
             break;
         case 'V':
-            if ([[self rawEvent] characterAtIndex:1] == 'S') {
+            if ([self.rawEvent characterAtIndex:1] == 'S') {
                 [self setEventType:DenonHDMISettingEvent];
                 return;
             }
             break;
         case 'R':
-            if ([[self rawEvent] characterAtIndex:1] == 'M') {
+            if ([self.rawEvent characterAtIndex:1] == 'M') {
                 [self setEventType:DenonRMEvent];
                 return;
             }
             break;
     }
-    DLog(@"unknown event received: %@", rawEvent_);
+    DLog(@"unknown event received: %@", self.rawEvent);
     [self setEventType:DenonUnknownEvent];
 }
 
 - (void) parseParameter {
     NSInteger index;
-    switch (eventType_) {
+    switch (_eventType) {
         case DenonPowerEvent:
         case DenonMainZoneEvent:
         case DenonMuteEvent:
@@ -392,7 +394,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             index = 0;
             break;
     }
-    [self setParameter:[[self rawEvent] substringFromIndex:index]];
+    [self setParameter:[self.rawEvent substringFromIndex:index]];
 }
 
 @end
