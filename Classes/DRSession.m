@@ -17,162 +17,84 @@
 
 #import "DRSession.h"
 #import "DREvent.h"
-#import "NSStream+Additions.h"
+#import "AsyncSocket.h"
 #import "DRDebuggingMacros.h"
-
-NSString * const DRRemoteEventReceivedNotification = @"DREventReceived";
-NSString * const DRRemoteEventKey = @"event";
-
-@interface DRSession ()
-- (void) processOutgoingBytes;
-- (void) readIncomingBytes;
-- (void) processResponse;
-- (void) stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode;
-@end
 
 @implementation DRSession
 
-@synthesize delegate = delegate_;
+@synthesize delegate = _delegate;
+
+#pragma mark -
+#pragma mark init & dealloc methods
 
 - (id) initWithHostName:(NSString *)host {
-    // default to telnet port
+    // default to telnet port 23
     return [self initWithHostName:host port:23];
 }
 
 - (id) initWithHostName:(NSString *)host port:(NSInteger)port {
     if (self = [super init]) {
-        oBuffer_ = [[NSMutableData alloc] init];
-        iBuffer_ = [[NSMutableData alloc] init];
-        
-        [NSStream getStreamsToHostNamed:host
-                                   port:port
-                            inputStream:&iStream_
-                           outputStream:&oStream_];
-        
-        [iStream_ retain];
-        [oStream_ retain];
-        
-        [iStream_ setDelegate:self];
-        [oStream_ setDelegate:self];
-        
-        [iStream_ scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        [oStream_ scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-        
-        // oStream_ is opened later in -stream:handleEvent:
-        [iStream_ open];
+        socket = [[AsyncSocket alloc] initWithDelegate:self];
+        // TODO: implement connect method to handle error
+        [socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+        [socket connectToHost:host onPort:port withTimeout:1.0 error:NULL];
     }
     return self;
 }
 
-- (void) close {
-    [iStream_ setDelegate:nil];
-    [iStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [iStream_ close];
-    [iStream_ setDelegate:nil];
-    [oStream_ close];
-    [oStream_ removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-}
-
 - (void) dealloc {
-    [iStream_ release];
-    [oStream_ release];
-    [iBuffer_ release];
-    [oBuffer_ release];
+    [socket release];
     [super dealloc];
 }
 
-- (void) sendCommand:(NSString *)command {
-    DLog(@"%@", command);
-    [oBuffer_ appendData:[command dataUsingEncoding:NSASCIIStringEncoding]];
-    [self processOutgoingBytes];
+#pragma mark -
+#pragma mark DRSession methods
+
+- (void) sendCommand:(NSString *)commandString {
+    NSData * command = [commandString dataUsingEncoding:NSASCIIStringEncoding];
+    DLog(@"%@", commandString);
+    [socket writeData:command withTimeout:1.0 tag:0L];
 }
 
-- (void) processResponse {
-    unsigned start = 0;
-    unsigned ilen = [iBuffer_ length];
-    
-    for (int i = 0; i < ilen; i++) {
-        if (*((char *)[iBuffer_ bytes] + i) == '\r') {
-            // copy current response to string
-            NSString *resp = [[[NSString alloc] initWithBytes:[iBuffer_ bytes] + start
-                                                       length:i - start
-                                                     encoding:NSASCIIStringEncoding] autorelease];
-            
-            DREvent *event = [[[DREvent alloc] initWithRawEvent:resp] autorelease];
-            
-            start = i + 1;
-            DLog(@"%@", event);
-            [[self delegate] session:self didReceiveEvent:event];
-        }
-    }
-    memmove([iBuffer_ mutableBytes], [iBuffer_ mutableBytes] + start, ilen - start);
-    [iBuffer_ setLength:ilen - start];
+- (void) close {
+    [socket disconnect];
+    [socket release];
+    socket = nil;
 }
 
-- (void) processOutgoingBytes {
-    // write as many bytes as possible from buffered bytes.
-    if (![oStream_ hasSpaceAvailable]) return;
-    
-    unsigned olen = [oBuffer_ length];
-    if (olen > 0) {
-        int writ = [oStream_ write:[oBuffer_ bytes] maxLength:olen];
-        // buffer any unwritten bytes for later writing
-        if (writ < olen) {
-            memmove([oBuffer_ mutableBytes], [oBuffer_ mutableBytes] + writ, olen - writ);
-            [oBuffer_ setLength:olen - writ];
-            return;
-        }
-        [oBuffer_ setLength:0];
-    }
+#pragma mark -
+#pragma mark AsyncSocket delegate call-backs
+
+-(void)onSocketDidDisconnect:(AsyncSocket *)sock {
+    DLog(@"socket did disconnect");
 }
 
-- (void) readIncomingBytes {
-    if (![iStream_ hasBytesAvailable]) return;
-    
-    uint8_t buf[512];
-    unsigned int len = 0;
-    // FIXME: why cast?
-    len = [(NSInputStream *)iStream_ read:buf maxLength:sizeof(buf)];
-    if (len)
-        [iBuffer_ appendBytes:(const void *)buf length:len];
-    else
-        if ([iStream_ streamStatus] != NSStreamStatusAtEnd)
-            DLog(@"failed to read data from network!");
+-(void)onSocket:(AsyncSocket *)sock willDisconnectWithError:(NSError *)err {
+    DLog(@"socket will disconnect with error: %@", err);
 }
 
-- (void) stream:(NSStream*)stream handleEvent:(NSStreamEvent)eventCode {
-    switch (eventCode) {
-        case NSStreamEventOpenCompleted: {
-            if (stream == iStream_) {
-                [oStream_ open];
-            }
-            break;
-        }
-        case NSStreamEventHasBytesAvailable: {
-            [self readIncomingBytes];
-            [self processResponse];
-            break;
-        }
-        case NSStreamEventHasSpaceAvailable: {
-            [self processOutgoingBytes];
-            break;
-        }
-        case NSStreamEventEndEncountered: {
-            [stream close];
-            [stream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            break;
-        }
-        case NSStreamEventErrorOccurred: {
-            NSError *error = [stream streamError];
-            DLog(@"%@ error: %@", stream, error);
-            [[self delegate] session:self didFailWithError:error];
-            [stream close];
-            [stream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-            break;
-        }
-        default:
-            break;
+
+-(void)onSocket:(AsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port {
+    DLog(@"socket connected to host");
+}
+
+-(void)onSocket:(AsyncSocket *)sock didReadData:(NSData*)data withTag:(long)tag {
+    NSString * reply = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    NSString * trimmedReply = [reply stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    DLog(@"socket received data: %@", reply);
+    DREvent *event = [[[DREvent alloc] initWithRawEvent:trimmedReply] autorelease];
+    [self.delegate session:self didReceiveEvent:event];
+    [socket readDataToData:[AsyncSocket CRData] withTimeout:-1.0 tag:0];
+}
+
+-(void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag {
+    static BOOL isFirstTime = YES;
+    if (isFirstTime) {
+        DLog(@"socket did write data, reading data first time");
+        [socket readDataToData:[AsyncSocket CRData] withTimeout:-1.0 tag:0];
+        isFirstTime = NO;
     }
 }
+
 
 @end

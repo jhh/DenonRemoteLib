@@ -70,9 +70,9 @@
 }
 
 - (NSUInteger) hash {
-    int prime = 31;
-    int result = 1;
-    result = prime * result + [self.source hash];
+    NSUInteger prime = 31;
+    NSUInteger result = 1;
+    result = prime + [self.source hash];
     result = prime * result + [self.name hash];
     return result;
 }

@@ -85,9 +85,9 @@ extern NSString * const DRSatelliteInputSource;
 
 @interface DREvent : NSObject {
 @private
-    NSString *rawEvent_;
-    NSString *parameter_;
-    DenonEventType eventType_;    
+    NSString * _rawEvent;
+    NSString * _parameter;
+    DenonEventType _eventType;
 }
 @property (copy, readonly) NSString *rawEvent;
 @property (retain) NSString *parameter;
