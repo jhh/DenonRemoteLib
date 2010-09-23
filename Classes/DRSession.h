@@ -33,7 +33,7 @@
 @private
     AsyncSocket * socket;
     id<DRSessionDelegate> _delegate;
-    
+    BOOL _firstWrite;
 }
 
 @property (assign) id<DRSessionDelegate> delegate;
