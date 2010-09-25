@@ -33,11 +33,18 @@
 }
 
 - (id) initWithHostName:(NSString *)host port:(NSInteger)port {
-    if (self = [super init]) {
+    if ( (self = [super init]) ) {
         socket = [[AsyncSocket alloc] initWithDelegate:self];
-        // TODO: implement connect method to handle error
+
+        // continue to send commands during mouse drags
         [socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+
+        // TODO: implement connect method to handle error
         [socket connectToHost:host onPort:port withTimeout:1.0 error:NULL];
+
+        // -onSocket:didWriteDataWithTag: will queue first read after first write
+        // on new socket, subsequent reads are called during -onSocket:didReadData:withTag:
+        _firstWrite = YES;
     }
     return self;
 }
@@ -59,7 +66,6 @@
 - (void) close {
     [socket disconnect];
     [socket release];
-    socket = nil;
 }
 
 #pragma mark -
@@ -75,7 +81,7 @@
 
 
 -(void)onSocket:(AsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port {
-    DLog(@"socket connected to host");
+    DLog(@"%@", socket);
 }
 
 -(void)onSocket:(AsyncSocket *)sock didReadData:(NSData*)data withTag:(long)tag {
@@ -88,11 +94,10 @@
 }
 
 -(void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag {
-    static BOOL isFirstTime = YES;
-    if (isFirstTime) {
+    if (_firstWrite) {
         DLog(@"socket did write data, reading data first time");
         [socket readDataToData:[AsyncSocket CRData] withTimeout:-1.0 tag:0];
-        isFirstTime = NO;
+        _firstWrite = NO;
     }
 }
 
