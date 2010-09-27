@@ -40,7 +40,7 @@
         [socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 
         // TODO: implement connect method to handle error
-        [socket connectToHost:host onPort:port withTimeout:1.0 error:NULL];
+        [socket connectToHost:host onPort:port error:NULL];
 
         // -onSocket:didWriteDataWithTag: will queue first read after first write
         // on new socket, subsequent reads are called during -onSocket:didReadData:withTag:
