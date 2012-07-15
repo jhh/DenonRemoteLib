@@ -53,11 +53,6 @@
     return [NSString stringWithFormat:@"%@ %@ => %@", [super description], self.source, self.name] ;
 }
 
-- (void) dealloc {
-    [_source dealloc];
-    [_name dealloc];
-    [super dealloc];
-}
 
 - (BOOL) isEqual:(id)other {
     if (other == self)

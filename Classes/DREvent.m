@@ -43,18 +43,13 @@ NSString * const DRSatelliteInputSource  = @"SAT";
 #pragma mark init & dealloc methods
 - (id) initWithRawEvent:(NSString *)raw {
     if((self = [super init])) {
-        _rawEvent = [raw retain];
+        _rawEvent = raw;
         [self parseEventType];
         [self parseParameter];
     }
     return self;
 }
 
-- (void) dealloc {
-    [_rawEvent release];
-    [_parameter release];
-    [super dealloc];
-}
 
 #pragma mark -
 #pragma mark Accessor Methods
@@ -96,7 +91,7 @@ NSString * const DRSatelliteInputSource  = @"SAT";
             || self.eventType == DenonInputSourceUsageEvent
             || self.eventType == DenonInputSourceEvent,
             @"do not use this accessor with this type of event: %@", self);
-    return [[[DRInputSource alloc] initWithEvent:self] autorelease];
+    return [[DRInputSource alloc] initWithEvent:self];
 }
 
 #pragma mark -
