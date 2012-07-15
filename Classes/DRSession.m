@@ -49,10 +49,6 @@
     return self;
 }
 
-- (void) dealloc {
-    [socket release];
-    [super dealloc];
-}
 
 #pragma mark -
 #pragma mark DRSession methods
@@ -65,7 +61,6 @@
 
 - (void) close {
     [socket disconnect];
-    [socket release];
 }
 
 #pragma mark -
@@ -85,10 +80,10 @@
 }
 
 -(void)onSocket:(AsyncSocket *)sock didReadData:(NSData*)data withTag:(long)tag {
-    NSString * reply = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    NSString * reply = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
     NSString * trimmedReply = [reply stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     DLog(@"socket received data: %@", reply);
-    DREvent *event = [[[DREvent alloc] initWithRawEvent:trimmedReply] autorelease];
+    DREvent *event = [[DREvent alloc] initWithRawEvent:trimmedReply];
     [self.delegate session:self didReceiveEvent:event];
     [socket readDataToData:[AsyncSocket CRData] withTimeout:-1.0 tag:0];
 }

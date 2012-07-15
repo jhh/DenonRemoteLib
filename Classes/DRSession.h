@@ -36,7 +36,7 @@
     BOOL _firstWrite;
 }
 
-@property (assign) id<DRSessionDelegate> delegate;
+@property  id<DRSessionDelegate> delegate;
 
 - (id) initWithHostName:(NSString *)host;
 - (id) initWithHostName:(NSString *)host port:(NSInteger)port;
