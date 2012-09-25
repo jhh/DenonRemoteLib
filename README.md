@@ -1,5 +1,7 @@
 # DenonRemoteLib
 
+**NOTE:** This project has been replaced by [AVRConnect](https://github.com/jhh/AVRConnect) and is no longer under active development.
+
 A Mac iOS and OSX library for interacting with the Denon AVR-4308CI receiver via the telnet network protocol.
 
 ## Adding DenonRemoteLib to your project
